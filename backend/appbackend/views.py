@@ -181,8 +181,9 @@ def dt_forgot(request):
     except: # uname key ali neg ni baihgui bol aldaanii medeelel butsaana
         action = jsons['action']
         respdata = []
-        resp = sendResponse(request, 3006, respdata, action) # response beldej baina. 6 keytei.
+        resp = sendResponse(request, 3016, respdata, action) # response beldej baina. 6 keytei.
         return resp
+    
     try: 
         myConn = connectDB() # database holbolt uusgej baina
         cursor = myConn.cursor() # cursor uusgej baina
@@ -275,112 +276,131 @@ def checkService(request): # hamgiin ehend duudagdah request shalgah service
             resp = sendResponse(request, 3001, respdata,action)
             return JsonResponse(resp)
     
-    # Method ni GET esehiig shalgaj baina
+    # Method ni GET esehiig shalgaj baina. register service, forgot password service deer mail yavuulna. Ene uyd link deer darahad GET method-r url duudagdana.
     elif request.method == "GET":
-        #http://localhost:8000/users/token=erjhfbuegrshjwiefnqier
-        token = request.GET.get('token')
+        #http://localhost:8000/users?token=erjhfbuegrshjwiefnqier
+        token = request.GET.get('token') # token parameteriin utgiig avch baina.
         
-        conn = connectDB() # database holbolt uusgej baina
-        cursor = conn.cursor() # cursor uusgej baina
-        # 
-        query = F"""
-                SELECT COUNT(*) AS tokencount
-                    , MIN(tokenid) AS tokenid
-                    , MIN(uid) AS uid
-                    , MIN(token) token, MIN(tokentype) tokentype
-                FROM t_token 
-                WHERE token = '{token}' 
-                        AND tokenenddate > NOW()"""
-        # print (query)
-        cursor.execute(query) # executing query
-        # print(cursor.description)
-        columns = cursor.description #
-        respRow = [{columns[index][0]:column for index, 
-            column in enumerate(value)} for value in cursor.fetchall()] # respRow is list and elements are dictionary. dictionary structure is columnName : value
-        # print(respRow)
-        
-        cursor.close() # close the cursor. ALWAYS
-        
-        if respRow[0]["tokencount"] == 1: # 
+        if (token is None):
+            action = "no action" 
+            respdata = []  # response-n data-g beldej baina. list turultei baih
+            resp = sendResponse(request, 3015, respdata, action)
+            return JsonResponse(resp)
+            # response beldej baina. 6 keytei.
             
+            
+        try: 
+            conn = connectDB() # database holbolt uusgej baina
+            cursor = conn.cursor() # cursor uusgej baina
+            
+            # gadnaas orj irsen token-r mur songoj toolj baina. Tuhain token ni idevhtei baigaag mun shalgaj baina.
+            query = F"""
+                    SELECT COUNT(*) AS tokencount
+                        , MIN(tokenid) AS tokenid
+                        , MAX(uid) AS uid
+                        , MIN(token) token
+                        , MAX(tokentype) tokentype
+                    FROM t_token 
+                    WHERE token = '{token}' 
+                            AND tokenenddate > NOW()"""
+            # print (query)
+            cursor.execute(query) # executing query
+            # print(cursor.description)
+            columns = cursor.description #
+            respRow = [{columns[index][0]:column for index, 
+                column in enumerate(value)} for value in cursor.fetchall()] # respRow is list and elements are dictionary. dictionary structure is columnName : value
+            # print(respRow)
             uid = respRow[0]["uid"]
             tokentype = respRow[0]["tokentype"]
             tokenid = respRow[0]["tokenid"]
             
-            cursor = conn.cursor() # cursor uusgej baina
-            if tokentype == "register":
-                query = f"""SELECT uname, lname, fname, createddate FROM t_user
-                        WHERE uid = {uid}"""
-                cursor.execute(query) # executing query
-                
-                columns = cursor.description #
-                respRow = [{columns[index][0]:column for index, 
-                    column in enumerate(value)} for value in cursor.fetchall()]
-                uname = respRow[0]['uname']
-                lname = respRow[0]['lname']
-                fname = respRow[0]['fname']
-                createddate = respRow[0]['createddate']
-                
-                query  = f"""SELECT COUNT(*) AS usercount
-                            , MIN(uname) AS uname
-                        FROM t_user 
-                        WHERE uname = '{uname}' AND isverified = True"""
-                cursor.execute(query) # executing query
-                columns = cursor.description #
-                respRow = [{columns[index][0]:column for index, 
-                    column in enumerate(value)} for value in cursor.fetchall()]
-                if respRow[0]['usercount'] == 0:
-                    token = generateStr(30)
-                    query = f"UPDATE t_user SET isverified = true WHERE uid = {uid}"
-                    cursor.execute(query)
-                    conn.commit()
+            if respRow[0]["tokencount"] == 1: # Hervee hargalzah token oldson baival ajillana.
+                #tokentype ni 3 turultei. (register, forgot, login) 
+                # End register, forgot hoyriig shagaj uzehed hangalttai. Uchir ni login type ni GET method-r hezee ch orj irehgui.
+                if tokentype == "register": # Hervee tokentype ni register bol ajillana.
+                    query = f"""SELECT uname, lname, fname, createddate 
+                            FROM t_user
+                            WHERE uid = {uid}""" # Tuhain neg hunii medeelliig avch baina.
+                    cursor.execute(query) # executing query
                     
-                    query = f"""UPDATE t_token SET token = '{token}', 
-                                tokenenddate = '1970-01-01' WHERE tokenid = {tokenid}"""
-                    cursor.execute(query)
-                    conn.commit()
+                    columns = cursor.description #
+                    respRow = [{columns[index][0]:column for index, 
+                        column in enumerate(value)} for value in cursor.fetchall()]
+                    uname = respRow[0]['uname']
+                    lname = respRow[0]['lname']
+                    fname = respRow[0]['fname']
+                    createddate = respRow[0]['createddate']
                     
-                    action = "verified"
-                    respdata = [{"uid":uid,"uname":uname, "lname":lname,
-                                "fname":fname,"tokentype":tokentype
+                    # Umnu uname-r verified bolson hereglegch baival tuhain uname-r dahin verified bolgoj bolohgui. Iimees umnu verified hereglegch oldoh yosgui. 
+                    query  = f"""SELECT COUNT(*) AS verifiedusercount 
+                                , MIN(uname) AS uname
+                            FROM t_user 
+                            WHERE uname = '{uname}' AND isverified = True"""
+                    cursor.execute(query) # executing query
+                    columns = cursor.description #
+                    respRow = [{columns[index][0]:column for index, 
+                        column in enumerate(value)} for value in cursor.fetchall()]
+                    
+                    if respRow[0]['verifiedusercount'] == 0:
+                        
+                        # verified user oldoogui tul hereglegchiin verified bolgono.
+                        query = f"UPDATE t_user SET isverified = true WHERE uid = {uid}"
+                        cursor.execute(query) # executing query
+                        conn.commit() # saving database
+                        
+                        token = generateStr(30) # huuchin token-oo uurchluh token uusgej baina
+                        # huuchin token-g idevhgui bolgoj baina.
+                        query = f"""UPDATE t_token SET token = '{token}', 
+                                    tokenenddate = '1970-01-01' WHERE tokenid = {tokenid}"""
+                        cursor.execute(query) # executing query
+                        conn.commit() # saving database
+                        
+                        # token verified service-n response
+                        action = "userverified"
+                        respdata = [{"uid":uid,"uname":uname, "lname":lname,
+                                    "fname":fname,"tokentype":tokentype
+                                    , "createddate":createddate}]
+                        resp = sendResponse(request, 3010, respdata, action) # response beldej baina. 6 keytei.
+                    else: # user verified already. User verify his or her mail verifying again. send Response. No change in Database.
+                        action = "user verified already"
+                        respdata = [{"uname":uname,"tokentype":tokentype}]
+                        resp = sendResponse(request, 3014, respdata, action) # response beldej baina. 6 keytei.
+                elif tokentype == "forgot": # Hervee tokentype ni gorgot password bol ajillana.
+                    
+                    query = f"""SELECT uname, lname, fname, createddate FROM t_user
+                            WHERE uid = {uid} AND isverified = True""" # Tuhain neg hunii medeelliig avch baina.
+                    cursor.execute(query) # executing query
+                    columns = cursor.description #
+                    respRow = [{columns[index][0]:column for index, 
+                        column in enumerate(value)} for value in cursor.fetchall()]
+                    
+                    uname = respRow[0]['uname']
+                    lname = respRow[0]['lname']
+                    fname = respRow[0]['fname']
+                    createddate = respRow[0]['createddate']
+                    
+                    # forgot password check token response
+                    action = "forgot user verify"
+                    respdata = [{"uid":uid,"uname":uname,  "tokentype":tokentype
                                 , "createddate":createddate}]
-                    resp = sendResponse(request, 3010, respdata, action) # response beldej baina. 6 keytei.
-                else:
-                    action = "notverified"
-                    respdata = [{"uname":uname,"tokentype":tokentype}]
-                    resp = sendResponse(request, 3014, respdata, action) # response beldej baina. 6 keytei.
-            elif tokentype == "forgot":
+                    resp = sendResponse(request, 3011, respdata, action) # response beldej baina. 6 keytei.
                 
-                query = f"""SELECT uname, lname, fname, createddate FROM t_user
-                        WHERE uid = {uid} AND isverified = True"""
-                cursor.execute(query) # executing query
+            else: # Hervee hargalzah token oldoogui bol ajillana.
+                # token buruu esvel hugatsaa duussan . Send Response
+                action = "notoken" 
+                respdata = []
+                resp = sendResponse(request, 3009, respdata, action) # response beldej baina. 6 keytei.
                 
-                columns = cursor.description #
-                respRow = [{columns[index][0]:column for index, 
-                    column in enumerate(value)} for value in cursor.fetchall()]
-                uname = respRow[0]['uname']
-                lname = respRow[0]['lname']
-                fname = respRow[0]['fname']
-                createddate = respRow[0]['createddate']
-                
-                action = "forgotverify"
-                respdata = [{"uid":uid,"uname":uname,  "tokentype":tokentype
-                            , "createddate":createddate}]
-                resp = sendResponse(request, 3011, respdata, action) # response beldej baina. 6 keytei.
-                
+        except:
+            # GET method dotood aldaa
+            action = "no action" 
+            respdata = []  # response-n data-g beldej baina. list turultei baih
+            resp = sendResponse(request, 5004, respdata, action)
+            # response beldej baina. 6 keytei.
+        finally:
+            cursor.close()
             disconnectDB(conn)
             return JsonResponse(resp)
-        else:
-            # token buruu esvel hugatsaa duussan 
-            action = "token"
-            respdata = []
-            resp = sendResponse(request, 3009, respdata, action) # response beldej baina. 6 keytei.
-            return JsonResponse(resp)
-        
-        # action = "token"
-        # respdata = [{"token":token}]
-        # resp = sendResponse(request, 200, respdata, action)
-        # return JsonResponse(resp)
     # Method ni POST, GET ali ali ni bish bol ajillana
     else:
         #GET, POST-s busad uyd ajillana
@@ -421,14 +441,17 @@ resultMessages = {
     3007 : "Register service key dutuu",
     3008 : "Batalgaajsan hereglegch baina. Register service.",
     3009 : "token buruu esvel hugatsaa duussan",
-    3010 : "Burtgel batalgaajlaa",
+    3010 : "Hereglegchiin burtgel batalgaajlaa",
     3011 : "Forgot password verified",
     3012 : "Forgot password huselt ilgeelee", 
     3013 : "Forgot password user not found", 
     3014 : "Batalgaajsan hereglegch baina. Umnuh burtgeleeree nevterne uu. Mail Link",
+    3015 : "no token parameter",
+    3016 : "forgot service key dutuu", 
     5001 : "Login service dotood aldaa",
     5002 : "Register service dotood aldaa",
-    5003 : "Forgot service dotood aldaa"
+    5003 : "Forgot service dotood aldaa",
+    5004 : "GET method token dotood aldaa"
     
 }
 
