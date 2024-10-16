@@ -172,10 +172,12 @@ def dt_register(request):
 
 # dt_register
 
+# Nuuts ugee martsan bol duudah service
 def dt_forgot(request):
     jsons = json.loads(request.body) # get request body
     action = jsons['action'] # get action key from jsons
     # print(action)
+    resp = {}
     try:
         uname = jsons['uname'].lower() # get uname key from jsons
     except: # uname key ali neg ni baihgui bol aldaanii medeelel butsaana
@@ -187,10 +189,11 @@ def dt_forgot(request):
     try: 
         myConn = connectDB() # database holbolt uusgej baina
         cursor = myConn.cursor() # cursor uusgej baina
+        # hereglegch burtgeltei esehiig shalgaj baina. Burtgelgui, verified hiigeegui hereglegch bol forgot password ajillahgui.
         query = f"""SELECT COUNT(*) AS usercount, MIN(uname) AS uname , MIN(uid) AS uid
                     FROM t_user
                     WHERE uname = '{uname}' AND isverified = True"""
-        cursor.execute(query)
+        cursor.execute(query) # executing query
         cursor.description
         columns = cursor.description #
         respRow = [{columns[index][0]:column for index, 
@@ -198,28 +201,30 @@ def dt_forgot(request):
         # print(respRow)
         
         
-        if respRow[0]['usercount'] == 1:
+        if respRow[0]['usercount'] == 1: # verified hereglegch oldson bol nuuts ugiig sergeehiig zuvshuurnu. 
             uid = respRow[0]['uid']
             uname = respRow[0]['uname']
-            token = generateStr(25)
-            query = F"""INSERT INTO t_token(uid, token, tokentype, tokenenddate, createddate) VALUES({uid}, '{token}', 'forgot', NOW() + interval \'1 day\', NOW() )""" # Inserting t_token
-            cursor.execute(query)
-            myConn.commit()
+            token = generateStr(25) # forgot password-iin token uusgej baina. 25 urttai
+            query = F"""INSERT INTO t_token(uid, token, tokentype, tokenenddate, createddate) VALUES({uid}, '{token}', 'forgot', NOW() + interval \'1 day\', NOW() )""" # Inserting forgot token in t_token
+            cursor.execute(query) # executing query
+            myConn.commit() # saving DB
             
+            # forgot password verify hiih mail
             subject = "Nuuts ug shinechleh"
             body = f"<a href='http://localhost:8000/user?token={token}'>Martsan nuuts ugee shinechleh link</a>"
-            sendMail(uname,subject,body)
+            sendMail(uname, subject, body)
             
+            # sending Response
             action = jsons['action']
             respdata = [{"uname":uname}]
             resp = sendResponse(request,3012,respdata,action )
             
-        else:
+        else: # verified user not found 
             action = jsons['action']
             respdata = [{"uname":uname}]
             resp = sendResponse(request,3013,respdata,action )
             
-    except Exception as e:
+    except Exception as e: # forgot service deer dotood aldaa garsan bol ajillana.
         # forgot service deer aldaa garval ajillana. 
         action = jsons["action"]
         respdata = [{"error":str(e)}] # hooson data bustaana.
@@ -365,7 +370,7 @@ def checkService(request): # hamgiin ehend duudagdah request shalgah service
                         action = "user verified already"
                         respdata = [{"uname":uname,"tokentype":tokentype}]
                         resp = sendResponse(request, 3014, respdata, action) # response beldej baina. 6 keytei.
-                elif tokentype == "forgot": # Hervee tokentype ni gorgot password bol ajillana.
+                elif tokentype == "forgot": # Hervee tokentype ni forgot password bol ajillana.
                     
                     query = f"""SELECT uname, lname, fname, createddate FROM t_user
                             WHERE uid = {uid} AND isverified = True""" # Tuhain neg hunii medeelliig avch baina.
@@ -384,6 +389,12 @@ def checkService(request): # hamgiin ehend duudagdah request shalgah service
                     respdata = [{"uid":uid,"uname":uname,  "tokentype":tokentype
                                 , "createddate":createddate}]
                     resp = sendResponse(request, 3011, respdata, action) # response beldej baina. 6 keytei.
+                else:
+                    # token-ii turul ni forgot, register ali ali ni bish bol buruu duudagdsan gej uzne.
+                    # login-ii token GET-r duudagdahgui. 
+                    action = "no action"
+                    respdata = []
+                    resp = sendResponse(request, 3017, respdata, action) # response beldej baina. 6 keytei.
                 
             else: # Hervee hargalzah token oldoogui bol ajillana.
                 # token buruu esvel hugatsaa duussan . Send Response
@@ -401,6 +412,7 @@ def checkService(request): # hamgiin ehend duudagdah request shalgah service
             cursor.close()
             disconnectDB(conn)
             return JsonResponse(resp)
+    
     # Method ni POST, GET ali ali ni bish bol ajillana
     else:
         #GET, POST-s busad uyd ajillana
@@ -448,6 +460,7 @@ resultMessages = {
     3014 : "Batalgaajsan hereglegch baina. Umnuh burtgeleeree nevterne uu. Mail Link",
     3015 : "no token parameter",
     3016 : "forgot service key dutuu", 
+    3017 : "not forgot and register GET token",
     5001 : "Login service dotood aldaa",
     5002 : "Register service dotood aldaa",
     5003 : "Forgot service dotood aldaa",
