@@ -10,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 # Odoogiin tsagiig duuddag service
 def dt_gettime(request):
     jsons = json.loads(request.body) # request body-g dictionary bolgon avch baina
+    action = jsons["action"] #jsons-s action-g salgaj avch baina
     
     # url: http://localhost:8000/user/
     # Method: POST
@@ -32,7 +33,6 @@ def dt_gettime(request):
     #     "curdate": "2024/11/06 07:53:58"
     # }
     
-    action = jsons["action"] #jsons-s action-g salgaj avch baina
     respdata = [{'time':datetime.now().strftime("%Y/%m/%d, %H:%M:%S")}]  # response-n data-g beldej baina. list turultei baih
     resp = sendResponse(request, 200, respdata, action)
     # response beldej baina. 6 keytei.
