@@ -10,6 +10,10 @@ from django.views.decorators.csrf import csrf_exempt
 # Odoogiin tsagiig duuddag service
 def dt_gettime(request):
     jsons = json.loads(request.body) # request body-g dictionary bolgon avch baina
+    
+    # request
+    # {"action":"gettime"}
+    
     action = jsons["action"] #jsons-s action-g salgaj avch baina
     respdata = [{'time':datetime.now().strftime("%Y/%m/%d, %H:%M:%S")}]  # response-n data-g beldej baina. list turultei baih
     resp = sendResponse(request, 200, respdata, action)
@@ -22,6 +26,14 @@ def dt_login(request):
     jsons = json.loads(request.body) # get request body
     action = jsons['action'] # get action key from jsons
     # print(action)
+    
+    # request
+    # {
+    #     "action": "login",
+    #     "uname": "ganzoo@mandakh.edu.mn",
+    #     "upassword":"73y483h4bhu34buhrbq3uhbi3aefgiu"
+    # }
+    
     try:
         uname = jsons['uname'].lower() # get uname key from jsons
         upassword = jsons['upassword'] # get upassword key from jsons
@@ -98,6 +110,15 @@ def dt_register(request):
     jsons = json.loads(request.body) # get request body
     action = jsons["action"] # get action key from jsons
     # print(action)
+    
+    # request
+    # {
+    #     "action": "register",
+    #     "uname": "ganzoo@mandakh.edu.mn",
+    #     "upassword":"a9b7ba70783b617e9998dc4dd82eb3c5",
+    #     "lname":"Ganzo",
+    #     "fname":"U"
+    # }
     try :
         uname = jsons["uname"].lower() # get uname key from jsons and lower
         lname = jsons["lname"].capitalize() # get lname key from jsons and capitalize
@@ -176,6 +197,12 @@ def dt_forgot(request):
     action = jsons['action'] # get action key from jsons
     # print(action)
     resp = {}
+    
+    # request
+    # {
+    #     "action": "forgot",
+    #     "uname": "ganzoo@mandakh.edu.mn"
+    # }
     try:
         uname = jsons['uname'].lower() # get uname key from jsons
     except: # uname key ali neg ni baihgui bol aldaanii medeelel butsaana
@@ -234,6 +261,155 @@ def dt_forgot(request):
         return resp # response bustaaj baina
 # dt_forgot
 
+# Nuuts ugee martsan uyd resetpassword service-r nuuts ugee shinechilne
+def dt_resetpassword(request):
+    jsons = json.loads(request.body) # get request body
+    action = jsons['action'] # get action key from jsons
+    # print(action)
+    resp = {}
+    #  {
+    #     "action": "resetpassword",
+    #     "token":"145v2n080t0lqh3i1dvpt3tgkrmn3kygqf5sqwnw",
+    #     "newpass":"MandakhSchool"
+    # }
+    try:
+        newpass = jsons['newpass'] # get newpass key from jsons
+        token = jsons['token'] # get token key from jsons
+    except: # newpass, token key ali neg ni baihgui bol aldaanii medeelel butsaana
+        action = jsons['action']
+        respdata = []
+        resp = sendResponse(request, 3018, respdata, action) # response beldej baina. 6 keytei.
+        return resp
+    
+    try: 
+        myConn = connectDB() # database holbolt uusgej baina
+        cursor = myConn.cursor() # cursor uusgej baina
+        
+        # Tuhain token deer burtgeltei batalgaajsan hereglegch baigaa esehiig shalgana. Neg l hereglegch songogdono esvel songogdohgui. Token buruu, hugatsaa duussan bol resetpassword service ajillahgui.
+        query = f"""SELECT COUNT (t_user.uid) AS usercount
+                , MIN(uname) AS uname
+                , MAX(t_user.uid) AS uid
+                , MAX(t_token.tokenid) AS tokenid
+                FROM t_user INNER JOIN t_token
+                ON t_user.uid = t_token.uid
+                WHERE t_token.token = '{token}'
+                AND t_user.isverified = True
+                AND t_token.tokenenddate > NOW()"""
+        cursor.execute(query) # executing query
+        columns = cursor.description #
+        respRow = [{columns[index][0]:column for index, 
+            column in enumerate(value)} for value in cursor.fetchall()] # respRow is list and elements are dictionary. dictionary structure is columnName : value
+        # print(respRow)
+        if respRow[0]['usercount'] == 1: # token idevhtei, verified hereglegch oldson bol nuuts ugiig shinechlehiig zuvshuurnu.
+            uid = respRow[0]['uid']
+            uname = respRow[0]['uname']
+            tokenid = respRow[0] ['tokenid'] 
+            token = generateStr(40) # shine ajilladaggui token uusgej baina. 40 urttai. 
+            query = F"""UPDATE t_user SET upassword = '{newpass}'
+                        WHERE t_user.uid = {uid}""" # Updating user's new password in t_user
+            cursor.execute(query) # executing query
+            myConn.commit() # saving DB
+            
+            query = F"""UPDATE t_token 
+                SET token = '{token}'
+                , tokenenddate = '1970-01-01' 
+                WHERE tokenid = {tokenid}""" # Updating token and tokenenddate in t_token. Token-iig idevhgui bolgoj baina
+            cursor.execute(query) # executing query
+            myConn.commit() # saving DB             
+            
+            # sending Response
+            action = jsons['action']
+            respdata = [{"uname":uname}]
+            resp = sendResponse(request,3019,respdata,action )
+            
+        else: # token not found 
+            action = jsons['action']
+            respdata = []
+            resp = sendResponse(request,3020,respdata,action )
+            
+    except Exception as e: # reset password service deer dotood aldaa garsan bol ajillana.
+        # reset service deer aldaa garval ajillana. 
+        action = jsons["action"]
+        respdata = [{"error":str(e)}] # aldaanii medeelel bustaana.
+        resp = sendResponse(request, 5005, respdata, action) # standartiin daguu 6 key-tei response butsaana
+    finally:
+        cursor.close() # close the cursor. ALWAYS
+        disconnectDB(myConn) # yamarch uyd database holbolt uussen bol holboltiig salgana. Uchir ni finally dotor baigaa
+        return resp # response bustaaj baina
+#dt_resetpassword
+
+# Huuchin nuuts ugee ashiglan Shine nuuts ugeer shinechleh service
+def dt_changepassword(request):
+    
+    jsons = json.loads(request.body) # get request body
+    action = jsons['action'] # get action key from jsons
+    # print(action)
+    resp = {}
+    # {
+    #     "action": "changepassword",
+    #     "uname": "ganzoo@mandakh.edu.mn",
+    #     "oldpass":"a1b2c3d4",
+    #     "newpass":"a1b2"
+    # }
+    try:
+        uname = jsons['uname'].lower() # get uname key from jsons
+        newpass = jsons['newpass'] # get newpass key from jsons
+        oldpass = jsons['oldpass'] # get oldpass key from jsons
+    except: # uname, newpass, oldpass key ali neg ni baihgui bol aldaanii medeelel butsaana
+        action = jsons['action']
+        respdata = []
+        resp = sendResponse(request, 3021, respdata, action) # response beldej baina. 6 keytei.
+        return resp
+    
+    try: 
+        myConn = connectDB() # database holbolt uusgej baina
+        cursor = myConn.cursor() # cursor uusgej baina
+        # burtgeltei batalgaajsan hereglegchiin nuuts ug zuv esehiig shalgaj baina. Burtgelgui, verified hiigeegui, huuchin nuuts ug taarahgui hereglegch bol change password ajillahgui.
+        query = f"""SELECT COUNT(uid) AS usercount ,MAX(uid) AS uid
+                    ,MIN(uname) AS uname
+                    ,MIN (lname) AS lname
+                    ,MAX (fname) AS fname
+                    FROM t_user
+                    WHERE uname='{uname}'  
+                    AND isverified=true
+                    AND upassword='{oldpass}'"""
+        cursor.execute(query) # executing query
+        columns = cursor.description #
+        respRow = [{columns[index][0]:column for index, 
+            column in enumerate(value)} for value in cursor.fetchall()] # respRow is list and elements are dictionary. dictionary structure is columnName : value
+        # print(respRow)
+        if respRow[0]['usercount'] == 1: # Burtgeltei, batalgaajsan, huuchin nuuts ug taarsan hereglegch oldson bol nuuts ugiig shineer solihiig zuvshuurnu.
+            uid = respRow[0]['uid']
+            uname = respRow[0]['uname']
+            lname = respRow[0]['lname']
+            fname = respRow[0]['fname']
+            
+            query = F"""UPDATE t_user SET upassword='{newpass}'
+                        WHERE uid={uid}""" # Updating user's new password using uid in t_user
+            cursor.execute(query) # executing query
+            myConn.commit() # saving DB
+            
+            # sending Response
+            action = jsons['action']
+            respdata = [{"uname":uname, "lname": lname, "fname":fname}]
+            resp = sendResponse(request, 3022, respdata, action )
+            
+        else: # old password not match
+            action = jsons['action']
+            respdata = [{"uname":uname}]
+            resp = sendResponse(request, 3023, respdata, action )
+            
+    except Exception as e: # change password service deer dotood aldaa garsan bol ajillana.
+        # change service deer aldaa garval ajillana. 
+        action = jsons["action"]
+        respdata = [{"error":str(e)}] # hooson data bustaana.
+        resp = sendResponse(request, 5006, respdata, action) # standartiin daguu 6 key-tei response butsaana
+    finally:
+        cursor.close() # close the cursor. ALWAYS
+        disconnectDB(myConn) # yamarch uyd database holbolt uussen bol holboltiig salgana. Uchir ni finally dotor baigaa
+        return resp # response bustaaj baina
+# dt_changepassword
+
 @csrf_exempt # method POST uyd ajilluulah csrf
 def checkService(request): # hamgiin ehend duudagdah request shalgah service
     if request.method == "POST": # Method ni POST esehiig shalgaj baina
@@ -273,6 +449,14 @@ def checkService(request): # hamgiin ehend duudagdah request shalgah service
         elif action == "forgot":
             result = dt_forgot(request)
             return JsonResponse(result)
+        #requestiin action resetpassword-r ajillna
+        elif action == "resetpassword":
+            result = dt_resetpassword(request)
+            return JsonResponse(result)
+        #requestiin action changepassword-r ajillna
+        elif action == "changepassword":
+            result = dt_changepassword(request)
+            return JsonResponse(result)
         # request-n action ni burtgegdeegui action bol else ajillana.
         else:
             action = "no action"
@@ -282,7 +466,8 @@ def checkService(request): # hamgiin ehend duudagdah request shalgah service
     
     # Method ni GET esehiig shalgaj baina. register service, forgot password service deer mail yavuulna. Ene uyd link deer darahad GET method-r url duudagdana.
     elif request.method == "GET":
-        #http://localhost:8000/users?token=erjhfbuegrshjwiefnqier
+        # request
+        # http://localhost:8000/users?token=erjhfbuegrshjwiefnqier
         token = request.GET.get('token') # token parameteriin utgiig avch baina.
         
         if (token is None):
@@ -460,11 +645,19 @@ resultMessages = {
     3015 : "no token parameter",
     3016 : "forgot service key dutuu", 
     3017 : "not forgot and register GET token",
+    3018 : "reset password key dutuu",
+    3019 : "martsan nuuts ugiig shinchille",
+    3020 : "token buruu baina esvel hugtsaa dussan. Nuust ugiig shinchilj chadsangu",
+    3021 : "change password service key dutuu ",
+    3022 : "nuuts ug amjilttai soligdloo ",
+    3023 : "huuchin nuuts ug taarsangui ",
+    3024 : "",
     5001 : "Login service dotood aldaa",
     5002 : "Register service dotood aldaa",
     5003 : "Forgot service dotood aldaa",
-    5004 : "GET method token dotood aldaa"
-    
+    5004 : "GET method token dotood aldaa",
+    5005 : "reset password service dotood aldaa ",
+    5006 : "change password service dotood aldaa ",
 }
 # resultMessage
 
