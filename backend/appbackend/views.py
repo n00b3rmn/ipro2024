@@ -7,7 +7,6 @@ import string, random, smtplib, psycopg2
 from email.mime.text import MIMEText
 from django.views.decorators.csrf import csrf_exempt
 
-
 # Odoogiin tsagiig duuddag service
 def dt_gettime(request):
     jsons = json.loads(request.body) # request body-g dictionary bolgon avch baina
@@ -169,7 +168,6 @@ def dt_register(request):
     finally:
         disconnectDB(conn) # yamarch uyd database holbolt uussen bol holboltiig salgana. Uchir ni finally dotor baigaa
         return resp # response bustaaj baina
-
 # dt_register
 
 # Nuuts ugee martsan bol duudah service
@@ -205,7 +203,8 @@ def dt_forgot(request):
             uid = respRow[0]['uid']
             uname = respRow[0]['uname']
             token = generateStr(25) # forgot password-iin token uusgej baina. 25 urttai
-            query = F"""INSERT INTO t_token(uid, token, tokentype, tokenenddate, createddate) VALUES({uid}, '{token}', 'forgot', NOW() + interval \'1 day\', NOW() )""" # Inserting forgot token in t_token
+            query = F"""INSERT INTO t_token(uid, token, tokentype, tokenenddate, createddate) 
+            VALUES({uid}, '{token}', 'forgot', NOW() + interval \'1 day\', NOW() )""" # Inserting forgot token in t_token
             cursor.execute(query) # executing query
             myConn.commit() # saving DB
             
@@ -278,7 +277,7 @@ def checkService(request): # hamgiin ehend duudagdah request shalgah service
         else:
             action = "no action"
             respdata = []
-            resp = sendResponse(request, 3001, respdata,action)
+            resp = sendResponse(request, 3001, respdata, action)
             return JsonResponse(resp)
     
     # Method ni GET esehiig shalgaj baina. register service, forgot password service deer mail yavuulna. Ene uyd link deer darahad GET method-r url duudagdana.
@@ -467,6 +466,7 @@ resultMessages = {
     5004 : "GET method token dotood aldaa"
     
 }
+# resultMessage
 
 # db connection
 def connectDB():
@@ -510,105 +510,3 @@ def sendMail(recipient, subj, bodyHtml):
         server.sendmail(sender_email, recipient_email, html_message.as_string())
         server.quit()
 #sendMail
-
-# def dt_register(request):
-#     jsons = json.loads(request.body)
-#     action = jsons['action']
-#     firstname = jsons['firstname']
-#     lastname = jsons['lastname']
-#     email = jsons['email']
-#     passw = jsons['passw']
-
-#     myCon = connectDB()
-#     cursor = myCon.cursor()
-    
-#     query = F"""SELECT COUNT(*) AS usercount FROM t_user 
-#             WHERE email = '{email}' AND enabled = 1"""
-    
-#     cursor.execute(query)
-#     columns = cursor.description
-#     respRow = [{columns[index][0]:column for index, 
-#         column in enumerate(value)} for value in cursor.fetchall()]
-#     cursor.close()
-
-#     if respRow[0]['usercount'] == 1:
-#         data = [{'email':email}]
-#         resp = sendResponse(request, 1000, data, action)
-#     else:
-#         token = generateStr(12)
-#         query = F"""INSERT INTO public.t_user(
-# 	email, lastname, firstname, passw, regdate, enabled, token, tokendate)
-# 	VALUES ('{email}', '{lastname}', '{firstname}', '{passw}'
-#     , NOW(), 0, '{token}', NOW() + interval \'1 day\');"""
-#         cursor1 = myCon.cursor()
-#         cursor1.execute(query)
-#         myCon.commit()
-#         cursor1.close()
-#         data = [{'email':email, 'firstname':firstname, 'lastname': lastname}]
-#         resp = sendResponse(request, 1001, data, action)
-        
-
-#         sendMail(email, "Verify your email", F"""
-#                 <html>
-#                 <body>
-#                     <p>Ta amjilttai burtguulle. Doorh link deer darj burtgelee batalgaajuulna uu. Hervee ta manai sited burtguuleegui bol ene mailiig ustgana uu.</p>
-#                     <p> <a href="http://localhost:8001/check/?token={token}">Batalgaajuulalt</a> </p>
-#                 </body>
-#                 </html>
-#                 """)
-
-#     return resp
-# # dt_register
-
-
-
-
-# @csrf_exempt
-# def checkToken(request):
-#     token = request.GET.get('token')
-#     myCon = connectDB()
-#     cursor = myCon.cursor()
-    
-#     query = F"""SELECT COUNT(*) AS usertokencount, MIN(email) as email, MAX(firstname) as firstname, 
-#                     MIN(lastname) AS lastname 
-#             FROM t_user 
-#             WHERE token = '{token}' AND enabled = 0 AND NOW() <= tokendate """
-    
-#     cursor.execute(query)
-#     columns = cursor.description
-#     respRow = [{columns[index][0]:column for index, 
-#         column in enumerate(value)} for value in cursor.fetchall()]
-#     cursor.close()
-
-#     if respRow[0]['usertokencount'] == 1:
-#         query = F"""UPDATE t_user SET enabled = 1 WHERE token = '{token}'"""
-#         cursor1 = myCon.cursor()
-#         cursor1.execute(query)
-#         myCon.commit()
-#         cursor1.close()
-
-#         tokenExpired = generateStr(30)
-#         email = respRow[0]['email']
-#         firstname = respRow[0]['firstname']
-#         lastname = respRow[0]['lastname']
-#         query = F"""UPDATE t_user SET token = '{tokenExpired}', tokendate = NOW() WHERE email = '{email}'"""
-#         cursor1 = myCon.cursor()
-#         cursor1.execute(query)
-#         myCon.commit()
-#         cursor1.close()
-        
-#         data = [{'email':email, 'firstname':firstname, 'lastname':lastname}]
-#         resp = sendResponse(request, 1003, data, "verified")
-#         sendMail(email, "Tanii mail batalgaajlaa",  F"""
-#                 <html>
-#                 <body>
-#                     <p>Tanii mail batalgaajlaa. </p>
-#                 </body>
-#                 </html>
-#                 """)
-#     else:
-        
-#         data = []
-#         resp = sendResponse(request, 3004, data, "not verified")
-#     return JsonResponse(json.loads(resp))
-# #checkToken
