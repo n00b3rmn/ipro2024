@@ -11,8 +11,26 @@ from django.views.decorators.csrf import csrf_exempt
 def dt_gettime(request):
     jsons = json.loads(request.body) # request body-g dictionary bolgon avch baina
     
-    # request
+    # url: http://localhost:8000/user/
+    # Method: POST
+    # Body: raw JSON
+    
+    # request body:
     # {"action":"gettime"}
+    
+    # response:
+    # {
+    #     "resultCode": 200,
+    #     "resultMessage": "Success",
+    #     "data": [
+    #         {
+    #             "time": "2024/11/06, 07:53:58"
+    #         }
+    #     ],
+    #     "size": 1,
+    #     "action": "gettime",
+    #     "curdate": "2024/11/06 07:53:58"
+    # }
     
     action = jsons["action"] #jsons-s action-g salgaj avch baina
     respdata = [{'time':datetime.now().strftime("%Y/%m/%d, %H:%M:%S")}]  # response-n data-g beldej baina. list turultei baih
@@ -27,13 +45,33 @@ def dt_login(request):
     action = jsons['action'] # get action key from jsons
     # print(action)
     
-    # request
+    # url: http://localhost:8000/user/
+    # Method: POST
+    # Body: raw JSON
+    
+    # request body:
     # {
     #     "action": "login",
     #     "uname": "ganzoo@mandakh.edu.mn",
     #     "upassword":"73y483h4bhu34buhrbq3uhbi3aefgiu"
     # }
     
+    # response:
+    # {
+    #     "resultCode": 1002,
+    #     "resultMessage": "Login Successful",
+    #     "data": [
+    #         {
+    #             "uname": "ganzoo@mandakh.edu.mn",
+    #             "fname": "Ganzo",
+    #             "lname": "U",
+    #             "lastlogin": "2024-11-06T15:57:52.996+08:00"
+    #         }
+    #     ],
+    #     "size": 1,
+    #     "action": "login",
+    #     "curdate": "2024/11/06 07:58:10"
+    # }
     try:
         uname = jsons['uname'].lower() # get uname key from jsons
         upassword = jsons['upassword'] # get upassword key from jsons
@@ -111,13 +149,33 @@ def dt_register(request):
     action = jsons["action"] # get action key from jsons
     # print(action)
     
-    # request
+    # url: http://localhost:8000/user/
+    # Method: POST
+    # Body: raw JSON
+    
+    # request body:
     # {
     #     "action": "register",
     #     "uname": "ganzoo@mandakh.edu.mn",
     #     "upassword":"a9b7ba70783b617e9998dc4dd82eb3c5",
     #     "lname":"Ganzo",
     #     "fname":"U"
+    # }
+    
+    # response:
+    # {
+    #     "resultCode": 200,
+    #     "resultMessage": "Success",
+    #     "data": [
+    #         {
+    #             "uname": "ganzoo@mandakh.edu.mn",
+    #             "lname": "U",
+    #             "fname": "Ganzo"
+    #         }
+    #     ],
+    #     "size": 1,
+    #     "action": "register",
+    #     "curdate": "2024/11/06 07:59:23"
     # }
     try :
         uname = jsons["uname"].lower() # get uname key from jsons and lower
@@ -198,10 +256,28 @@ def dt_forgot(request):
     # print(action)
     resp = {}
     
-    # request
+    # url: http://localhost:8000/user/
+    # Method: POST
+    # Body: raw JSON
+    
+    # request body:
     # {
     #     "action": "forgot",
     #     "uname": "ganzoo@mandakh.edu.mn"
+    # }
+    
+    # response: 
+    # {
+    #     "resultCode": 3012,
+    #     "resultMessage": "Forgot password huselt ilgeelee",
+    #     "data": [
+    #         {
+    #             "uname": "ganzoo@mandakh.edu.mn"
+    #         }
+    #     ],
+    #     "size": 1,
+    #     "action": "forgot",
+    #     "curdate": "2024/11/06 08:00:32"
     # }
     try:
         uname = jsons['uname'].lower() # get uname key from jsons
@@ -267,10 +343,30 @@ def dt_resetpassword(request):
     action = jsons['action'] # get action key from jsons
     # print(action)
     resp = {}
+    
+    # url: http://localhost:8000/user/
+    # Method: POST
+    # Body: raw JSON
+    
+    # request body:
     #  {
     #     "action": "resetpassword",
     #     "token":"145v2n080t0lqh3i1dvpt3tgkrmn3kygqf5sqwnw",
     #     "newpass":"MandakhSchool"
+    # }
+    
+    # response:
+    # {
+    #     "resultCode": 3019,
+    #     "resultMessage": "martsan nuuts ugiig shinchille",
+    #     "data": [
+    #         {
+    #             "uname": "ganzoo@mandakh.edu.mn"
+    #         }
+    #     ],
+    #     "size": 1,
+    #     "action": "resetpassword",
+    #     "curdate": "2024/11/06 08:03:25"
     # }
     try:
         newpass = jsons['newpass'] # get newpass key from jsons
@@ -340,16 +436,37 @@ def dt_resetpassword(request):
 
 # Huuchin nuuts ugee ashiglan Shine nuuts ugeer shinechleh service
 def dt_changepassword(request):
-    
     jsons = json.loads(request.body) # get request body
     action = jsons['action'] # get action key from jsons
     # print(action)
     resp = {}
+    
+    # url: http://localhost:8000/user/
+    # Method: POST
+    # Body: raw JSON
+    
+    # request body:
     # {
     #     "action": "changepassword",
     #     "uname": "ganzoo@mandakh.edu.mn",
     #     "oldpass":"a1b2c3d4",
     #     "newpass":"a1b2"
+    # }
+    
+    # response: 
+    # {
+    #     "resultCode": 3022,
+    #     "resultMessage": "nuuts ug amjilttai soligdloo ",
+    #     "data": [
+    #         {
+    #             "uname": "ganzoo@mandakh.edu.mn",
+    #             "lname": "U",
+    #             "fname": "Ganzo"
+    #         }
+    #     ],
+    #     "size": 1,
+    #     "action": "changepassword",
+    #     "curdate": "2024/11/06 08:04:18"
     # }
     try:
         uname = jsons['uname'].lower() # get uname key from jsons
@@ -466,8 +583,29 @@ def checkService(request): # hamgiin ehend duudagdah request shalgah service
     
     # Method ni GET esehiig shalgaj baina. register service, forgot password service deer mail yavuulna. Ene uyd link deer darahad GET method-r url duudagdana.
     elif request.method == "GET":
-        # request
-        # http://localhost:8000/users?token=erjhfbuegrshjwiefnqier
+        # url: http://localhost:8000/users?token=erjhfbuegrshjwiefnqier
+        # Method: GET
+        # Body: NONE
+        
+        # request body: NONE
+        
+        # response:
+        # {
+        #     "resultCode": 3011,
+        #     "resultMessage": "Forgot password verified",
+        #     "data": [
+        #         {
+        #             "uid": 33,
+        #             "uname": "ganzoo@mandakh.edu.mn",
+        #             "tokentype": "forgot",
+        #             "createddate": "2024-10-16T11:21:57.455+08:00"
+        #         }
+        #     ],
+        #     "size": 1,
+        #     "action": "forgot user verify",
+        #     "curdate": "2024/11/06 08:06:25"
+        # }
+        
         token = request.GET.get('token') # token parameteriin utgiig avch baina.
         
         if (token is None):
