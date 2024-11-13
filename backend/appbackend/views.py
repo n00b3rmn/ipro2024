@@ -3,9 +3,8 @@ from django.shortcuts import render
 from datetime import datetime
 from django.http import JsonResponse
 import json
-import string, random, smtplib, psycopg2
-from email.mime.text import MIMEText
 from django.views.decorators.csrf import csrf_exempt
+from backend.settings import sendMail, sendResponse ,disconnectDB, connectDB, resultMessages,generateStr
 
 # Odoogiin tsagiig duuddag service
 def dt_gettime(request):
@@ -103,7 +102,7 @@ def dt_login(request):
             cursor1 = myConn.cursor() # creating cursor1
             
             # get logged user information
-            query = F"""SELECT uname, fname, lname, lastlogin
+            query = F"""SELECT uid, uname, fname, lname, lastlogin
                     FROM t_user 
                     WHERE uname = '{uname}' AND isverified = True AND upassword = '{upassword}'"""
             
@@ -114,12 +113,13 @@ def dt_login(request):
                 column in enumerate(value)} for value in cursor1.fetchall()] # respRow is list. elements are dictionary. dictionary structure is columnName : value
             # print(respRow)
             
+            uid = respRow[0]['uid'] #
             uname = respRow[0]['uname'] # 
             fname = respRow[0]['fname'] #
             lname = respRow[0]['lname'] #
             lastlogin = respRow[0]['lastlogin'] #
 
-            respdata = [{'uname':uname, 'fname':fname, 'lname':lname, 'lastlogin':lastlogin}] # creating response logged user information
+            respdata = [{'uid': uid,'uname':uname, 'fname':fname, 'lname':lname, 'lastlogin':lastlogin}] # creating response logged user information
             resp = sendResponse(request, 1002, respdata, action) # response beldej baina. 6 keytei.
 
             query = F"""UPDATE t_user 
@@ -742,102 +742,3 @@ def checkService(request): # hamgiin ehend duudagdah request shalgah service
         respdata = []
         resp = sendResponse(request, 3002, respdata, action)
         return JsonResponse(resp)
-        
-#Standartiin daguu response json-g 6 key-tei bolgoj beldej baina.
-def sendResponse(request, resultCode, data, action="no action"):
-    response = {} # response dictionary zarlaj baina
-    response["resultCode"] = resultCode # 
-    response["resultMessage"] = resultMessages[resultCode] #resultCode-d hargalzah message-g avch baina
-    response["data"] = data
-    response["size"] = len(data) # data-n urtiig avch baina
-    response["action"] = action
-    response["curdate"] = datetime.now().strftime('%Y/%m/%d %H:%M:%S') # odoogiin tsagiig response-d oruulj baina
-
-    return response 
-#   sendResponse
-
-# result Messages. nemj hugjuuleerei
-resultMessages = {
-    200:"Success",
-    400:'Bad Request',
-    404:"Not found",
-    1000 : "Burtgeh bolomjgui. Mail hayag umnu burtgeltei baina",
-    1001 : "Hereglegch Amjilttai burtgegdlee. Batalgaajuulah mail ilgeegdlee. 24 tsagiin dotor batalgaajuulna.",
-    1002 : "Login Successful",
-    1003 : "Amjilttai batalgaajlaa",
-    1004 : "Hereglegchiin ner, nuuts ug buruu baina.",
-    3001 : "ACTION BURUU",
-    3002 : "METHOD BURUU",
-    3003 : "JSON BURUU",
-    3004 : "Token-ii hugatsaa duussan. Idevhgui token baina.",
-    3005 : "NO ACTION",
-    3006 : "Login service key dutuu",
-    3007 : "Register service key dutuu",
-    3008 : "Batalgaajsan hereglegch baina. Register service.",
-    3009 : "token buruu esvel hugatsaa duussan",
-    3010 : "Hereglegchiin burtgel batalgaajlaa",
-    3011 : "Forgot password verified",
-    3012 : "Forgot password huselt ilgeelee", 
-    3013 : "Forgot password user not found", 
-    3014 : "Batalgaajsan hereglegch baina. Umnuh burtgeleeree nevterne uu. Mail Link",
-    3015 : "no token parameter",
-    3016 : "forgot service key dutuu", 
-    3017 : "not forgot and register GET token",
-    3018 : "reset password key dutuu",
-    3019 : "martsan nuuts ugiig shinchille",
-    3020 : "token buruu baina esvel hugtsaa dussan. Nuust ugiig shinchilj chadsangu",
-    3021 : "change password service key dutuu ",
-    3022 : "nuuts ug amjilttai soligdloo ",
-    3023 : "huuchin nuuts ug taarsangui ",
-    3024 : "",
-    5001 : "Login service dotood aldaa",
-    5002 : "Register service dotood aldaa",
-    5003 : "Forgot service dotood aldaa",
-    5004 : "GET method token dotood aldaa",
-    5005 : "reset password service dotood aldaa ",
-    5006 : "change password service dotood aldaa ",
-}
-# resultMessage
-
-# db connection
-def connectDB():
-    conn = psycopg2.connect (
-        host = 'localhost', #server host
-        # host = '59.153.86.251',
-        dbname = 'postgres', # database name
-        user = 'useripro2024', # databse user 
-        password = '123', 
-        port = '5938', # postgre port
-    )
-    return conn
-# connectDB
-
-# DB disconnect hiij baina
-def disconnectDB(conn):
-    conn.close()
-# disconnectDB
-
-#random string generating
-def generateStr(length):
-    characters = string.ascii_lowercase + string.digits # jijig useg, toonuud
-    password = ''.join(random.choice(characters) for i in range(length)) # jijig useg toonuudiig token-g ugugdsun urtiin daguu (parameter length) uusgej baina
-    return password # uusgesen token-g butsaalaa
-# generateStr
-
-def sendMail(recipient, subj, bodyHtml):
-    sender_email = "testmail@mandakh.edu.mn"
-    sender_password = "Mandakh2"
-    recipient_email = recipient
-    subject = subj
-    body = bodyHtml
-    html_message = MIMEText(body, 'html')
-    html_message['Subject'] = subject
-    html_message['From'] = sender_email
-    html_message['To'] = recipient_email
-    with smtplib.SMTP('smtp-mail.outlook.com',587) as server:
-        server.ehlo()
-        server.starttls()
-        server.login(sender_email, sender_password)
-        server.sendmail(sender_email, recipient_email, html_message.as_string())
-        server.quit()
-#sendMail
