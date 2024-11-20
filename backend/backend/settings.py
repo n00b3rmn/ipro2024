@@ -149,6 +149,8 @@ resultMessages = {
     1003 : "Amjilttai batalgaajlaa",
     1004 : "Hereglegchiin ner, nuuts ug buruu baina.",
     1005 : "edituser success",
+    1006 : "getuserresume success",
+    1007 : "getalluser success",
     3001 : "ACTION BURUU",
     3002 : "METHOD BURUU",
     3003 : "JSON BURUU",
@@ -173,6 +175,12 @@ resultMessages = {
     3022 : "nuuts ug amjilttai soligdloo ",
     3023 : "huuchin nuuts ug taarsangui ",
     3024 : "edituser service key dutuu",
+    3025 : "getuserresume service key dutuu", 
+    3026 : "getalluser service key dutuu", 
+    3027 : "", 
+    3028 : "", 
+    3029 : "", 
+    3030 : "", 
     5001 : "Login service dotood aldaa",
     5002 : "Register service dotood aldaa",
     5003 : "Forgot service dotood aldaa",
@@ -180,6 +188,8 @@ resultMessages = {
     5005 : "reset password service dotood aldaa ",
     5006 : "change password service dotood aldaa ",
     5007 : "edituser service dotood aldaa",
+    5008 : "getuserresume service dotood aldaa",
+    5009 : "getalluser service dotood aldaa",
 }
 # resultMessage
 
