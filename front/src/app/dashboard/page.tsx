@@ -88,6 +88,12 @@ export default function Dashboard() {
             className="bg-gray-300 text-white px-6 py-1 rounded-md hover:bg-gray-700 transition"
           >
             Change Password
+          </button>{" "}
+          <button
+            onClick={() => router.push("/edituser")}
+            className="bg-gray-300 text-white px-6 py-1 rounded-md hover:bg-gray-700 transition"
+          >
+            Edit user
           </button>
         </h2>
 
