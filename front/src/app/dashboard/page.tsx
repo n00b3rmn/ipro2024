@@ -82,8 +82,15 @@ export default function Dashboard() {
 
       <div className="bg-gray-50 p-4 rounded-md shadow-md">
         <h2 className="text-2xl font-semibold text-gray-700">
-          Welcome, {user.fname} {user.lname}!
+          Welcome, {user.fname} {user.lname}! {/* Change Password link */}
+          <button
+            onClick={() => router.push("/changepassword")}
+            className="bg-gray-300 text-white px-6 py-1 rounded-md hover:bg-gray-700 transition"
+          >
+            Change Password
+          </button>
         </h2>
+
         <p className="text-lg text-gray-600">Email: {user.uname}</p>
         {user.lastlogin && (
           <p className="text-lg text-gray-600">

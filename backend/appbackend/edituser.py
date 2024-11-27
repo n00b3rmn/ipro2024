@@ -44,7 +44,7 @@ def dt_edituser(request):
     action = jsons['action'] # get action key from jsons
     # print(action)
     
-    # url: http://localhost:8000/edituser/
+    # url: http://localhost:8000/useredit/
     # Method: POST
     # Body: raw JSON
     
@@ -125,7 +125,7 @@ def dt_getuserresume(request):
     action = jsons['action'] # get action key from jsons
     # print(action)
     
-    # url: http://localhost:8000/edituser/
+    # url: http://localhost:8000/useredit/
     # Method: POST
     # Body: raw JSON
     
@@ -253,7 +253,7 @@ def dt_getalluser(request):
     action = jsons['action'] # get action key from jsons
     # print(action)
     
-    # url: http://localhost:8000/edituser/
+    # url: http://localhost:8000/useredit/
     # Method: POST
     # Body: raw JSON
     
