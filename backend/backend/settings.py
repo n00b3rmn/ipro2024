@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'appbackend', # uusgesen app-aa holboj ugch baina.
+    'corsheaders', # CORS ashiglaj baina
 ]
 
 MIDDLEWARE = [
@@ -50,6 +51,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',  # add this line if it's not already present
+]
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',  # Allow requests from localhost:3000
 ]
 
 ROOT_URLCONF = 'backend.urls'
