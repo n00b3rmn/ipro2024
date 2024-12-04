@@ -583,7 +583,7 @@ def checkService(request): # hamgiin ehend duudagdah request shalgah service
     
     # Method ni GET esehiig shalgaj baina. register service, forgot password service deer mail yavuulna. Ene uyd link deer darahad GET method-r url duudagdana.
     elif request.method == "GET":
-        # url: http://localhost:8000/users?token=erjhfbuegrshjwiefnqier
+        # url: http://localhost:8000/user?token=erjhfbuegrshjwiefnqier
         # Method: GET
         # Body: NONE
         
