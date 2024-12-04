@@ -1,6 +1,7 @@
 export const sendRequest = async (
   url: string,
   method: "GET" | "POST" | "PUT" | "DELETE",
+  //method: string,
   body: Record<string, any> | null = null,
   headers: Record<string, string> = {}
 ): Promise<any> => {
