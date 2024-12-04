@@ -232,7 +232,7 @@ def dt_register(request):
             
             action = jsons['action']
             # register service success response with data
-            respdata = [{"uname":uname,"lname":lname,"fname":fname}]
+            respdata = [{"uname":uname,"lname":lname,"fname":fname, "uid": uid}]
             resp = sendResponse(request, 200, respdata, action) # response beldej baina. 6 keytei.
         else:
             action = jsons['action']

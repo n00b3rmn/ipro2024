@@ -4,53 +4,57 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { sendRequest } from "../../utils/api";
 
-interface User {
+interface Data {
   uid: number;
   uname: string;
   fname: string;
   lname: string;
   lastlogin?: string; // Optional as it might not exist initially
+  skills: [];
+  education: [];
 }
 
 interface Response {
   resultCode: number;
   resultMessage: string;
-  data: User[];
+  data: Data[];
   size: number;
   action: string;
   curdate: string;
 }
 
 export default function Dashboard() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<Data | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     const fetchUser = async () => {
-      const userData = localStorage.getItem("token");
-      if (!userData) {
+      const token = localStorage.getItem("token");
+      if (!token) {
         router.push("/login");
         return;
       }
 
       try {
-        const parsedUser = JSON.parse(userData);
+        const parsedUser = JSON.parse(token);
         // Assuming `parsedUser` contains a UID or some unique identifier
-        const response: Response = await sendRequest(
-          "http://localhost:8000/useredit/",
-          "POST",
-          {
-            action: "getuserresume",
-            uid: parsedUser.uid,
-          }
-        );
 
-        if (response.resultCode === 1006 && response.data?.length) {
+        let surl = "http://localhost:8000/useredit/";
+        let smethod = "POST";
+        let sbody = {
+          action: "getuserresume",
+          uid: parsedUser.uid,
+        };
+
+        const response: Response = await sendRequest(surl, smethod, sbody);
+
+        if (response.resultCode === 1006) {
           setUser(response.data[0]); // Assuming the API response structure
+          // console.log(response);
         } else {
-          setError(response.resultMessage || "Failed to load user data");
+          setError(response.resultMessage);
           localStorage.removeItem("token"); // Clear invalid token
           router.push("/login");
         }

@@ -4,10 +4,13 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { sendRequest } from "../../utils/api";
 
+interface Data {
+  uname: string;
+}
 interface Response {
   resultCode: number;
   resultMessage: string;
-  data: { uname: string }[];
+  data: Data[];
   size: number;
   action: string;
   curdate: string;
@@ -44,14 +47,15 @@ export default function ForgotPassword() {
     setLoadingSendLink(true);
     try {
       // Make a request to the backend to send password reset email
-      const response: Response = await sendRequest(
-        "http://localhost:8000/user/",
-        "POST",
-        {
-          action: "forgot",
-          uname: email,
-        }
-      );
+
+      let surl = "http://localhost:8000/user/";
+      let smethod = "POST";
+      let sbody = {
+        action: "forgot",
+        uname: email,
+      };
+
+      const response: Response = await sendRequest(surl, smethod, sbody);
 
       // Handle the response based on resultCode
       if (response.resultCode === 3012) {

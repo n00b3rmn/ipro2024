@@ -4,10 +4,18 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { sendRequest, convertToMD5password } from "../../utils/api";
 
-interface UserInfo {
+interface Data {
   uname: string;
   fname: string;
   lname: string;
+}
+interface Response {
+  resultCode: number;
+  resultMessage: string;
+  data: Data[];
+  size: number;
+  action: string;
+  curdate: string;
 }
 
 export default function ChangePassword() {
@@ -17,37 +25,44 @@ export default function ChangePassword() {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true); // Set loading to true initially
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null); // Store user info
+  const [userInfo, setUserInfo] = useState<Data | null>(null); // Store user info
   const router = useRouter();
 
   // Fetch user info when the component mounts
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/login");
-      return;
-    }
+    const fetchUser = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/login");
+        return;
+      }
 
-    const user = JSON.parse(token);
-    // Fetch user details using the getuserresume action
-    sendRequest("http://localhost:8000/useredit/", "POST", {
-      action: "getuserresume",
-      uid: user.uid, // Pass the user id from the logged-in user
-    })
-      .then((response) => {
+      try {
+        const user = JSON.parse(token);
+        // Fetch user details using the getuserresume action
+
+        let surl = "http://localhost:8000/useredit/";
+        let smethod = "POST";
+        let sbody = {
+          action: "getuserresume",
+          uid: user.uid, // Pass the user id from the logged-in user
+        };
+
+        const response: Response = await sendRequest(surl, smethod, sbody);
+
         if (response.resultCode === 1006) {
           setUserInfo(response.data[0]); // Set user information from response
         } else {
           setError(response.resultMessage);
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         setError("An error occurred while fetching user information.");
         console.error(err);
-      })
-      .finally(() => {
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+    fetchUser();
   }, [router]);
 
   const handleChangePassword = async (e: React.FormEvent) => {
@@ -80,16 +95,17 @@ export default function ChangePassword() {
       const hashedNewPassword = convertToMD5password(newPassword);
 
       // Send password change request to the backend
-      const response = await sendRequest(
-        "http://localhost:8000/user/",
-        "POST",
-        {
-          action: "changepassword",
-          uname: user.uname, // Use the logged-in user's email
-          oldpass: hashedOldPassword,
-          newpass: hashedNewPassword,
-        }
-      );
+
+      let surl = "http://localhost:8000/user/";
+      let smethod = "POST";
+      let sbody = {
+        action: "changepassword",
+        uname: user.uname, // Use the logged-in user's email
+        oldpass: hashedOldPassword,
+        newpass: hashedNewPassword,
+      };
+
+      const response: Response = await sendRequest(surl, smethod, sbody);
 
       // Handle the response
       if (response.resultCode === 3022) {

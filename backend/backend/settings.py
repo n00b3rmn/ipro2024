@@ -165,7 +165,7 @@ resultMessages = {
     3005 : "NO ACTION",
     3006 : "Login service key dutuu",
     3007 : "Register service key dutuu",
-    3008 : "Batalgaajsan hereglegch baina. Register service.",
+    3008 : "Баталгаажсан хэрэглэгч байна. Register service.",
     3009 : "token buruu esvel hugatsaa duussan",
     3010 : "Hereglegchiin burtgel batalgaajlaa",
     3011 : "Forgot password verified",

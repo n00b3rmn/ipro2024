@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { sendRequest } from "../../utils/api";
 
-interface User {
+interface Data {
   uid: number;
   uname: string;
   fname: string;
@@ -14,14 +14,14 @@ interface User {
 interface Response {
   resultCode: number;
   resultMessage: string;
-  data: User[];
+  data: Data[];
   size: number;
   action: string;
   curdate: string;
 }
 
 export default function EditUser() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<Data | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");

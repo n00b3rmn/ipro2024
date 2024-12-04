@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { sendRequest, convertToMD5password } from "../../utils/api";
 
-interface User {
+interface Data {
+  uid: number;
   uname: string;
   lname: string;
   fname: string;
@@ -13,7 +14,7 @@ interface User {
 interface Response {
   resultCode: number;
   resultMessage: string;
-  data: User[];
+  data: Data[];
   size: number;
   action: string;
   curdate: string;
@@ -54,21 +55,22 @@ export default function Register() {
     try {
       const hashedPassword = convertToMD5password(password); // Convert password to MD5 hash
 
-      const response: Response = await sendRequest(
-        "http://localhost:8000/user/",
-        "POST",
-        {
-          action: "register",
-          uname: email,
-          upassword: hashedPassword,
-          lname: lastName,
-          fname: firstName,
-        }
-      );
+      let surl = "http://localhost:8000/user/";
+      let smethod = "POST";
+      let sbody = {
+        action: "register",
+        uname: email,
+        upassword: hashedPassword,
+        lname: lastName,
+        fname: firstName,
+      };
+
+      const response: Response = await sendRequest(surl, smethod, sbody);
 
       // Handle the response based on the resultCode
       if (response.resultCode === 200) {
         // Successful registration, redirect to login page
+        const userData = response.data[0];
         setSuccessMessage(response.resultMessage);
         setError(""); // Clear any previous error
       } else {

@@ -4,16 +4,18 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { sendRequest, convertToMD5password } from "../../utils/api";
 
-interface User {
+interface Data {
+  uid: number;
   uname: string;
   lname: string;
   fname: string;
+  lastlogin: string;
 }
 
 interface Response {
   resultCode: number;
   resultMessage: string;
-  data: User[];
+  data: Data[];
   size: number;
   action: string;
   curdate: string;
@@ -44,22 +46,22 @@ export default function Login() {
     try {
       const hashedPassword = convertToMD5password(password); // Convert password to MD5 hash
 
-      const response: Response = await sendRequest(
-        "http://localhost:8000/user/",
-        "POST",
-        {
-          action: "login",
-          uname: email,
-          upassword: hashedPassword,
-        }
-      );
+      let surl = "http://localhost:8000/user/";
+      let smethod = "POST";
+      let sbody = {
+        action: "login",
+        uname: email,
+        upassword: hashedPassword,
+      };
+
+      const response: Response = await sendRequest(surl, smethod, sbody);
 
       if (response.resultCode === 1002 && response.data?.length) {
         const userData = response.data[0];
         localStorage.setItem("token", JSON.stringify(userData)); // Save user data
         router.push("/dashboard");
       } else {
-        setError(response.resultMessage || "Login failed");
+        setError(response.resultMessage);
       }
     } catch (err) {
       console.error(err);
