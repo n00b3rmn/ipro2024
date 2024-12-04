@@ -40,14 +40,14 @@ export default function EditUser() {
       try {
         const parsedUser = JSON.parse(userData);
         // Fetching the current user info
-        const response: Response = await sendRequest(
-          "http://localhost:8000/useredit/",
-          "POST",
-          {
-            action: "getuserresume",
-            uid: parsedUser.uid,
-          }
-        );
+        let surl = "http://localhost:8000/useredit/";
+        let smethod = "POST";
+        let sbody = {
+          action: "getuserresume",
+          uid: parsedUser.uid,
+        };
+
+        const response: Response = await sendRequest(surl, smethod, sbody);
 
         if (response.resultCode === 1006 && response.data?.length) {
           const currentUser = response.data[0];
@@ -84,16 +84,17 @@ export default function EditUser() {
 
     try {
       // Send the updated first name and last name
-      const response = await sendRequest(
-        "http://localhost:8000/useredit/",
-        "POST",
-        {
-          action: "edituser",
-          uid: user?.uid,
-          fname: newFname,
-          lname: newLname,
-        }
-      );
+
+      let surl = "http://localhost:8000/useredit/";
+      let smethod = "POST";
+      let sbody = {
+        action: "edituser",
+        uid: user?.uid,
+        fname: newFname,
+        lname: newLname,
+      };
+
+      const response = await sendRequest(surl, smethod, sbody);
 
       if (response.resultCode === 1005) {
         setUser({ ...user, fname: newFname, lname: newLname });
