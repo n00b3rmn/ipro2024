@@ -132,7 +132,7 @@ export default function Login() {
         </p>
 
         <p className="mt-2 text-sm text-gray-500 text-center">
-          Forgot your password?
+          Forgot your password?{" "}
           <a href="/forgot" className="text-indigo-500 hover:underline">
             Reset it here
           </a>

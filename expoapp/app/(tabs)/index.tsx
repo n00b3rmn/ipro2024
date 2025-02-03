@@ -1,117 +1,326 @@
-import React, { useState } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, Alert } from "react-native";
+import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Platform,
+  StatusBar,
+  useWindowDimensions,
+  Image,
+  ScrollView,
+} from "react-native";
 
-export default function App() {
-  const [board, setBoard] = useState(Array(9).fill(null)); // 3x3 board
-  const [isXTurn, setIsXTurn] = useState(true); // Player X starts
+import { SafeAreaView } from "react-native-safe-area-context";
+import { TabView, SceneMap, TabBar } from "react-native-tab-view";
+import AntDesign from "@expo/vector-icons/AntDesign";
+const FirstRoute = () => (
+  <View style={{ flex: 1, backgroundColor: "#ccc" }}>
+    <ScrollView>
+      <View style={{ height: 150 }}>
+        <ScrollView
+          horizontal={true}
+          contentContainerStyle={{
+            alignItems: "center",
+            //justifyContent: "space-around",
+            flexDirection: "row",
 
-  // Check for a winner
-  const checkWinner = (board) => {
-    const winningCombinations = [
-      [0, 1, 2],
-      [3, 4, 5],
-      [6, 7, 8],
-      [0, 3, 6],
-      [1, 4, 7],
-      [2, 5, 8],
-      [0, 4, 8],
-      [2, 4, 6],
-    ];
-
-    for (const [a, b, c] of winningCombinations) {
-      if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-        return board[a]; // Return the winner ('X' or 'O')
-      }
-    }
-
-    return null; // No winner
-  };
-
-  const handlePress = (index) => {
-    if (board[index] || checkWinner(board)) {
-      return; // Ignore clicks if the square is occupied or game is over
-    }
-
-    const updatedBoard = [...board];
-    updatedBoard[index] = isXTurn ? "X" : "O";
-    setBoard(updatedBoard);
-    setIsXTurn(!isXTurn);
-
-    const winner = checkWinner(updatedBoard);
-    if (winner) {
-      Alert.alert(`🎉 Player ${winner} Wins!`);
-    } else if (!updatedBoard.includes(null)) {
-      Alert.alert("It's a draw!");
-    }
-  };
-
-  const resetGame = () => {
-    setBoard(Array(9).fill(null));
-    setIsXTurn(true);
-  };
-
-  const renderSquare = (value, index) => (
-    <TouchableOpacity
-      key={index}
-      style={styles.square}
-      onPress={() => handlePress(index)}
-    >
-      <Text style={styles.squareText}>{value}</Text>
-    </TouchableOpacity>
-  );
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tic Tac Toe</Text>
-      <View style={styles.board}>
-        {board.map((value, index) => renderSquare(value, index))}
+            //height: 150,
+            //borderWidth: 1,
+          }}
+        >
+          <Image
+            style={styles.imgContainer}
+            source={{
+              uri: "https://reactnative.dev/img/tiny_logo.png",
+            }}
+          />
+          <Image
+            style={styles.imgContainer}
+            source={{
+              uri: "https://reactnative.dev/img/tiny_logo.png",
+            }}
+          />
+          <Image
+            style={styles.imgContainer}
+            source={{
+              uri: "https://reactnative.dev/img/tiny_logo.png",
+            }}
+          />
+          <Image
+            style={styles.imgContainer}
+            source={{
+              uri: "https://reactnative.dev/img/tiny_logo.png",
+            }}
+          />
+          <Image
+            style={styles.imgContainer}
+            source={{
+              uri: "https://reactnative.dev/img/tiny_logo.png",
+            }}
+          />
+          <Image
+            style={styles.imgContainer}
+            source={{
+              uri: "https://reactnative.dev/img/tiny_logo.png",
+            }}
+          />
+          <Image
+            style={styles.imgContainer}
+            source={{
+              uri: "https://reactnative.dev/img/tiny_logo.png",
+            }}
+          />
+          <Image
+            style={styles.imgContainer}
+            source={{
+              uri: "https://reactnative.dev/img/tiny_logo.png",
+            }}
+          />
+          <Image
+            style={styles.imgContainer}
+            source={{
+              uri: "https://reactnative.dev/img/tiny_logo.png",
+            }}
+          />
+          <Image
+            style={styles.imgContainer}
+            source={{
+              uri: "https://reactnative.dev/img/tiny_logo.png",
+            }}
+          />
+          <Image
+            style={styles.imgContainer}
+            source={{
+              uri: "https://reactnative.dev/img/tiny_logo.png",
+            }}
+          />
+          <Image
+            style={styles.imgContainer}
+            source={{
+              uri: "https://reactnative.dev/img/tiny_logo.png",
+            }}
+          />
+          <Image
+            style={styles.imgContainer}
+            source={{
+              uri: "https://reactnative.dev/img/tiny_logo.png",
+            }}
+          />
+        </ScrollView>
       </View>
-      <TouchableOpacity style={styles.resetButton} onPress={resetGame}>
-        <Text style={styles.resetText}>Restart Game</Text>
-      </TouchableOpacity>
-    </View>
+      <View style={{ flexDirection: "row" }}>
+        <Text style={{ fontWeight: 800 }}>Энэ сарын онцлох</Text>
+        <AntDesign name="star" size={18} color="gold" />
+      </View>
+      <View style={{}}>
+        <Text style={{ fontSize: 10 }}>Аудио ном</Text>
+      </View>
+      <ScrollView
+        horizontal={true}
+        contentContainerStyle={{
+          alignItems: "center",
+          //justifyContent: "space-around",
+          flexDirection: "row",
+
+          //height: 150,
+          //borderWidth: 1,
+        }}
+      >
+        <ScrollView horizontal={true}>
+          <View>
+            <Image
+              style={styles.imgContainer}
+              source={{
+                uri: "https://reactnative.dev/img/tiny_logo.png",
+              }}
+            />
+            <Text style={{ color: "gray", marginLeft: 10 }}>James</Text>
+            <Text style={{ fontSize: 10, marginLeft: 10 }}>Shidet muhlag </Text>
+          </View>
+          <View>
+            <Image
+              style={styles.imgContainer}
+              source={{
+                uri: "https://reactnative.dev/img/tiny_logo.png",
+              }}
+            />
+            <Text style={{ color: "gray", marginLeft: 10 }}>James</Text>
+            <Text style={{ fontSize: 10, marginLeft: 10 }}>Shidet muhlag </Text>
+          </View>
+          <View>
+            <Image
+              style={styles.imgContainer}
+              source={{
+                uri: "https://reactnative.dev/img/tiny_logo.png",
+              }}
+            />
+            <Text style={{ color: "gray", marginLeft: 10 }}>James</Text>
+            <Text style={{ fontSize: 10, marginLeft: 10 }}>Shidet muhlag </Text>
+          </View>
+          <View>
+            <Image
+              style={styles.imgContainer}
+              source={{
+                uri: "https://reactnative.dev/img/tiny_logo.png",
+              }}
+            />
+            <Text style={{ color: "gray", marginLeft: 10 }}>James</Text>
+            <Text style={{ fontSize: 10, marginLeft: 10 }}>Shidet muhlag </Text>
+          </View>
+          <View>
+            <Image
+              style={styles.imgContainer}
+              source={{
+                uri: "https://reactnative.dev/img/tiny_logo.png",
+              }}
+            />
+            <Text style={{ color: "gray", marginLeft: 10 }}>James</Text>
+            <Text style={{ fontSize: 10, marginLeft: 10 }}>Shidet muhlag </Text>
+          </View>
+          <View>
+            <Image
+              style={styles.imgContainer}
+              source={{
+                uri: "https://reactnative.dev/img/tiny_logo.png",
+              }}
+            />
+            <Text style={{ color: "gray", marginLeft: 10 }}>James</Text>
+            <Text style={{ fontSize: 10, marginLeft: 10 }}>Shidet muhlag </Text>
+          </View>
+          <View>
+            <Image
+              style={styles.imgContainer}
+              source={{
+                uri: "https://reactnative.dev/img/tiny_logo.png",
+              }}
+            />
+            <Text style={{ color: "gray", marginLeft: 10 }}>James</Text>
+            <Text style={{ fontSize: 10, marginLeft: 10 }}>Shidet muhlag </Text>
+          </View>
+          <View>
+            <Image
+              style={styles.imgContainer}
+              source={{
+                uri: "https://reactnative.dev/img/tiny_logo.png",
+              }}
+            />
+            <Text style={{ color: "gray", marginLeft: 10 }}>James</Text>
+            <Text style={{ fontSize: 10, marginLeft: 10 }}>Shidet muhlag </Text>
+          </View>
+          <View>
+            <Image
+              style={styles.imgContainer}
+              source={{
+                uri: "https://reactnative.dev/img/tiny_logo.png",
+              }}
+            />
+            <Text style={{ color: "gray", marginLeft: 10 }}>James</Text>
+            <Text style={{ fontSize: 10, marginLeft: 10 }}>Shidet muhlag </Text>
+          </View>
+          <View>
+            <Image
+              style={styles.imgContainer}
+              source={{
+                uri: "https://reactnative.dev/img/tiny_logo.png",
+              }}
+            />
+            <Text style={{ color: "gray", marginLeft: 10 }}>James</Text>
+            <Text style={{ fontSize: 10, marginLeft: 10 }}>Shidet muhlag </Text>
+          </View>
+          <View>
+            <Image
+              style={styles.imgContainer}
+              source={{
+                uri: "https://reactnative.dev/img/tiny_logo.png",
+              }}
+            />
+            <Text style={{ color: "gray", marginLeft: 10 }}>James</Text>
+            <Text style={{ fontSize: 10, marginLeft: 10 }}>Shidet muhlag </Text>
+          </View>
+        </ScrollView>
+      </ScrollView>
+      <Text>abc</Text>
+      <Text>abc</Text>
+      <Text>abc</Text>
+      <Text>abc</Text>
+      <Text>abc</Text>
+      <Text>abc</Text>
+      <Text>abc</Text>
+    </ScrollView>
+  </View>
+);
+
+const SecondRoute = () => (
+  <View style={{ flex: 1, backgroundColor: "#673ab7" }}></View>
+);
+
+const ThirdRoute = () => (
+  <View style={{ flex: 1, backgroundColor: "#673ab7" }} />
+);
+
+const renderScene = SceneMap({
+  first: FirstRoute,
+  second: SecondRoute,
+  third: ThirdRoute,
+  a: ThirdRoute,
+  b: ThirdRoute,
+  c: ThirdRoute,
+  d: ThirdRoute,
+  e: ThirdRoute,
+  f: ThirdRoute,
+  g: ThirdRoute,
+  h: ThirdRoute,
+  i: ThirdRoute,
+});
+
+const routes = [
+  { key: "first", title: "Танд зориулсан" },
+  { key: "second", title: "Аудио ном" },
+  { key: "third", title: "Цахим ном" },
+  { key: "a", title: "Цахим ном" },
+  { key: "b", title: "Цахим ном" },
+  { key: "c", title: "Цахим ном" },
+  { key: "d", title: "Цахим ном" },
+  { key: "e", title: "Цахим ном" },
+  { key: "f", title: "Цахим ном" },
+  { key: "g", title: "Цахим ном" },
+  { key: "h", title: "Цахим ном" },
+  { key: "i", title: "Цахим ном" },
+];
+
+export default function index() {
+  const layout = useWindowDimensions();
+  const [index, setIndex] = React.useState(0);
+  return (
+    <SafeAreaView style={styles.container}>
+      <TabView
+        navigationState={{ index, routes }}
+        renderScene={renderScene}
+        onIndexChange={setIndex}
+        initialLayout={{ width: layout.width }}
+        renderTabBar={(props) => (
+          <TabBar
+            {...props}
+            scrollEnabled={true} // Tab-ууд гүйлгэх боломжтой болно
+            style={{ backgroundColor: "orange" }}
+          />
+        )}
+      />
+      <Text>HELLO WORLD</Text>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "white",
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
   },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-  board: {
-    width: 300,
-    height: 300,
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
-  square: {
-    width: "33.33%",
-    height: "33.33%",
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#ddd",
-  },
-  squareText: {
-    fontSize: 40,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  resetButton: {
-    marginTop: 20,
-    padding: 10,
-    backgroundColor: "#007bff",
-    borderRadius: 8,
-  },
-  resetText: {
-    color: "#fff",
-    fontSize: 18,
+  imgContainer: {
+    height: 100,
+    width: 100,
+    marginRight: 10,
+    marginLeft: 10,
   },
 });
