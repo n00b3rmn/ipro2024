@@ -12,111 +12,63 @@ import {
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
-import AntDesign from "@expo/vector-icons/AntDesign";
+import { AntDesign, FontAwesome6 } from "@expo/vector-icons";
+
 const FirstRoute = () => (
   <View style={{ flex: 1, backgroundColor: "#ccc" }}>
     <ScrollView>
       <View style={{ height: 150 }}>
         <ScrollView
           horizontal={true}
+          showsHorizontalScrollIndicator={false}
           contentContainerStyle={{
             alignItems: "center",
             //justifyContent: "space-around",
             flexDirection: "row",
-
-            //height: 150,
-            //borderWidth: 1,
           }}
         >
-          <Image
-            style={styles.imgContainer}
-            source={{
-              uri: "https://reactnative.dev/img/tiny_logo.png",
-            }}
-          />
-          <Image
-            style={styles.imgContainer}
-            source={{
-              uri: "https://reactnative.dev/img/tiny_logo.png",
-            }}
-          />
-          <Image
-            style={styles.imgContainer}
-            source={{
-              uri: "https://reactnative.dev/img/tiny_logo.png",
-            }}
-          />
-          <Image
-            style={styles.imgContainer}
-            source={{
-              uri: "https://reactnative.dev/img/tiny_logo.png",
-            }}
-          />
-          <Image
-            style={styles.imgContainer}
-            source={{
-              uri: "https://reactnative.dev/img/tiny_logo.png",
-            }}
-          />
-          <Image
-            style={styles.imgContainer}
-            source={{
-              uri: "https://reactnative.dev/img/tiny_logo.png",
-            }}
-          />
-          <Image
-            style={styles.imgContainer}
-            source={{
-              uri: "https://reactnative.dev/img/tiny_logo.png",
-            }}
-          />
-          <Image
-            style={styles.imgContainer}
-            source={{
-              uri: "https://reactnative.dev/img/tiny_logo.png",
-            }}
-          />
-          <Image
-            style={styles.imgContainer}
-            source={{
-              uri: "https://reactnative.dev/img/tiny_logo.png",
-            }}
-          />
-          <Image
-            style={styles.imgContainer}
-            source={{
-              uri: "https://reactnative.dev/img/tiny_logo.png",
-            }}
-          />
-          <Image
-            style={styles.imgContainer}
-            source={{
-              uri: "https://reactnative.dev/img/tiny_logo.png",
-            }}
-          />
-          <Image
-            style={styles.imgContainer}
-            source={{
-              uri: "https://reactnative.dev/img/tiny_logo.png",
-            }}
-          />
-          <Image
-            style={styles.imgContainer}
-            source={{
-              uri: "https://reactnative.dev/img/tiny_logo.png",
-            }}
-          />
+          {Array.from({ length: 5 }).map((_, index) => (
+            <View>
+              <Image
+                style={styles.imgContainerTop}
+                source={{
+                  uri: "https://reactnative.dev/img/tiny_logo.png",
+                }}
+              />
+              {/* Icon overlay on the image */}
+              <AntDesign
+                name="heart"
+                size={20}
+                color="red"
+                style={{ position: "absolute", top: 5, right: 15 }}
+              />
+            </View>
+          ))}
         </ScrollView>
       </View>
       <View style={{ flexDirection: "row" }}>
-        <Text style={{ fontWeight: 800 }}>Энэ сарын онцлох</Text>
-        <AntDesign name="star" size={18} color="gold" />
+        <View style={{ flexDirection: "row", flex: 3, alignItems: "center" }}>
+          <Text style={{ fontWeight: 800 }}>Энэ сарын онцлох</Text>
+          <AntDesign name="star" size={18} color="gold" />
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            flex: 1,
+          }}
+        >
+          <Text style={{ fontWeight: 800 }}>Бүгд</Text>
+          <AntDesign name="star" size={18} color="gold" />
+        </View>
       </View>
       <View style={{}}>
         <Text style={{ fontSize: 10 }}>Аудио ном</Text>
       </View>
       <ScrollView
         horizontal={true}
+        showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
           alignItems: "center",
           //justifyContent: "space-around",
@@ -126,7 +78,7 @@ const FirstRoute = () => (
           //borderWidth: 1,
         }}
       >
-        <ScrollView horizontal={true}>
+        {Array.from({ length: 10 }).map((_, index) => (
           <View>
             <Image
               style={styles.imgContainer}
@@ -137,107 +89,7 @@ const FirstRoute = () => (
             <Text style={{ color: "gray", marginLeft: 10 }}>James</Text>
             <Text style={{ fontSize: 10, marginLeft: 10 }}>Shidet muhlag </Text>
           </View>
-          <View>
-            <Image
-              style={styles.imgContainer}
-              source={{
-                uri: "https://reactnative.dev/img/tiny_logo.png",
-              }}
-            />
-            <Text style={{ color: "gray", marginLeft: 10 }}>James</Text>
-            <Text style={{ fontSize: 10, marginLeft: 10 }}>Shidet muhlag </Text>
-          </View>
-          <View>
-            <Image
-              style={styles.imgContainer}
-              source={{
-                uri: "https://reactnative.dev/img/tiny_logo.png",
-              }}
-            />
-            <Text style={{ color: "gray", marginLeft: 10 }}>James</Text>
-            <Text style={{ fontSize: 10, marginLeft: 10 }}>Shidet muhlag </Text>
-          </View>
-          <View>
-            <Image
-              style={styles.imgContainer}
-              source={{
-                uri: "https://reactnative.dev/img/tiny_logo.png",
-              }}
-            />
-            <Text style={{ color: "gray", marginLeft: 10 }}>James</Text>
-            <Text style={{ fontSize: 10, marginLeft: 10 }}>Shidet muhlag </Text>
-          </View>
-          <View>
-            <Image
-              style={styles.imgContainer}
-              source={{
-                uri: "https://reactnative.dev/img/tiny_logo.png",
-              }}
-            />
-            <Text style={{ color: "gray", marginLeft: 10 }}>James</Text>
-            <Text style={{ fontSize: 10, marginLeft: 10 }}>Shidet muhlag </Text>
-          </View>
-          <View>
-            <Image
-              style={styles.imgContainer}
-              source={{
-                uri: "https://reactnative.dev/img/tiny_logo.png",
-              }}
-            />
-            <Text style={{ color: "gray", marginLeft: 10 }}>James</Text>
-            <Text style={{ fontSize: 10, marginLeft: 10 }}>Shidet muhlag </Text>
-          </View>
-          <View>
-            <Image
-              style={styles.imgContainer}
-              source={{
-                uri: "https://reactnative.dev/img/tiny_logo.png",
-              }}
-            />
-            <Text style={{ color: "gray", marginLeft: 10 }}>James</Text>
-            <Text style={{ fontSize: 10, marginLeft: 10 }}>Shidet muhlag </Text>
-          </View>
-          <View>
-            <Image
-              style={styles.imgContainer}
-              source={{
-                uri: "https://reactnative.dev/img/tiny_logo.png",
-              }}
-            />
-            <Text style={{ color: "gray", marginLeft: 10 }}>James</Text>
-            <Text style={{ fontSize: 10, marginLeft: 10 }}>Shidet muhlag </Text>
-          </View>
-          <View>
-            <Image
-              style={styles.imgContainer}
-              source={{
-                uri: "https://reactnative.dev/img/tiny_logo.png",
-              }}
-            />
-            <Text style={{ color: "gray", marginLeft: 10 }}>James</Text>
-            <Text style={{ fontSize: 10, marginLeft: 10 }}>Shidet muhlag </Text>
-          </View>
-          <View>
-            <Image
-              style={styles.imgContainer}
-              source={{
-                uri: "https://reactnative.dev/img/tiny_logo.png",
-              }}
-            />
-            <Text style={{ color: "gray", marginLeft: 10 }}>James</Text>
-            <Text style={{ fontSize: 10, marginLeft: 10 }}>Shidet muhlag </Text>
-          </View>
-          <View>
-            <Image
-              style={styles.imgContainer}
-              source={{
-                uri: "https://reactnative.dev/img/tiny_logo.png",
-              }}
-            />
-            <Text style={{ color: "gray", marginLeft: 10 }}>James</Text>
-            <Text style={{ fontSize: 10, marginLeft: 10 }}>Shidet muhlag </Text>
-          </View>
-        </ScrollView>
+        ))}
       </ScrollView>
       <Text>abc</Text>
       <Text>abc</Text>
@@ -306,7 +158,10 @@ export default function index() {
           />
         )}
       />
-      <Text>HELLO WORLD</Text>
+      <View style={{ flexDirection: "row" }}>
+        <Text>HELLO WORLD</Text>
+        <FontAwesome6 name="chevron-right" size={24} color="plum" />
+      </View>
     </SafeAreaView>
   );
 }
@@ -320,6 +175,12 @@ const styles = StyleSheet.create({
   imgContainer: {
     height: 100,
     width: 100,
+    marginRight: 10,
+    marginLeft: 10,
+  },
+  imgContainerTop: {
+    height: 100,
+    width: 200,
     marginRight: 10,
     marginLeft: 10,
   },
