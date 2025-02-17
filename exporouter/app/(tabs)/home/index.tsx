@@ -20,7 +20,10 @@ const index = () => {
       </Pressable>
       <Pressable
         onPress={() => {
-          router.push({ pathname: "/Home2" });
+          router.push({
+            pathname: "/home/Home2",
+            params: { id: 2, ipro: "ip" },
+          });
         }}
       >
         <Image

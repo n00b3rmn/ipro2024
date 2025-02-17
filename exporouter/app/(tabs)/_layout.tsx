@@ -4,7 +4,7 @@ const BottomRouter = () => {
   return (
     <Tabs>
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
           headerTitle: "Home page",
           title: "Home",
