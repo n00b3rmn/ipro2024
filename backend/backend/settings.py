@@ -206,9 +206,9 @@ def connectDB():
         host = 'localhost', #server host
         # host = '59.153.86.251',
         dbname = 'postgres', # database name
-        user = 'useripro2024', # databse user 
-        password = '123', 
-        port = '5938', # postgre port
+        user = 'Internet', # databse user 
+        password = '1000', 
+        port = '5432', # postgre port
     )
     return conn
 # connectDB
